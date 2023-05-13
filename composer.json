@@ -1,0 +1,26 @@
+{
+    "name": "teriz/zebua",
+    "description": "Template Enggine",
+    "type": "project",
+    "license": "Made with love by Teriz (https://teriz.id)",
+    "autoload": {
+        "psr-4": {
+            "Zebua\\Teriz\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Teris Z",
+            "email": "terzebua@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8",
+        "phpmailer/phpmailer": "^6.7",
+        "endroid/qr-code": "^4.7",
+		"chillerlan/php-qrcode": "^4.3",
+        "picqer/php-barcode-generator": "*",
+        "midtrans/midtrans-php": "^2.5",
+        "jenssegers/blade": "*"
+    }
+}

@@ -1,0 +1,155 @@
+.trans{
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 2;
+}
+.trans img{
+	position: relative;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+.bingkai{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.bingkai_1 img{
+	top: 0;
+    left: 0;
+    position: absolute;
+    z-index: 3;
+    transform: rotate(0deg) !important;
+}
+.bingkai_2{
+    top: 0;
+    display: flex;
+    justify-content: center;
+}
+.bingkai_2 img{
+	top: 0;
+    position: absolute;
+    z-index: 2;
+    transform: rotate(0deg) !important;
+}
+.bingkai_3 img{
+	bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: 3;
+    transform: rotate(0deg) !important;
+}
+.bingkai_4{
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+}
+.bingkai_4 img{
+	bottom: 0;
+    position: absolute;
+    z-index: 2;
+    transform: rotate(0deg) !important;
+}
+.bingkai_1 img{
+    width: 78vw;
+}
+.bingkai_2 img{
+    width: 100vw;
+}
+.bingkai_3 img{
+    width: 100vw;
+}
+.bingkai_4 img{
+    width: 100vw;
+}
+.full-img{
+	background-size: 100% 100%;
+}
+.title-wedding{
+	font-family: 'Roboto';
+    font-weight: bold;
+    line-height: 2 !important;
+    margin-bottom: 21px;
+}
+.title-name{
+	font-family: 'Norican';
+	line-height: 1.1 !important;
+}
+.title-selection, .judul-theme{
+	font-family: 'Fredoka One';
+}
+.title-wedding, .title-name, .title-selection, .judul-theme, .tanggal, a:hover{
+    color: #386A71;
+}
+.btn-testimoni, .plyr__controls, .btn-map, .btn-theme{
+    font-weight: 700 !important;
+    color: white !important;
+	background: #8db8db !important;
+	border: 1px solid #8db8db !important;
+}
+.timeline ul li:nth-child(odd):before,
+.timeline ul li:nth-child(even):before {
+    background: #386A71;
+}
+.right_content{
+    background-color: rgb(56, 106, 113, 5%);
+}
+.timeline ul li:nth-child(odd) .right_content,
+.timeline ul li:nth-child(even) .right_content {
+    border-left-color: #386A71;
+}
+.timeline ul li:nth-child(odd) .right_content::after,
+.timeline ul li:nth-child(even) .right_content::after{
+    border-right-color: #386A71;
+}
+@media only screen and (max-width: 600px){
+	.full-img{
+        position: relative;
+		background-size: 100% 100%;
+        z-index: 2;
+	}
+	.trans{
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	}
+	.trans img{
+		height: 90%;
+		width: 90%;
+	}
+}
+@media only screen and (min-width: 600px){
+    .bingkai_1 img{
+		width: 42vw;
+	}
+	.bingkai_2 img{
+		width: 100vw;
+	}
+	.bingkai_3 img{
+		width: 35vw;
+	}
+	.bingkai_4 img{
+		width: 100vw;
+	}
+}
+@media only screen and (min-width: 992px){
+    .bingkai_1 img{
+		width: 28vw;
+	}
+	.bingkai_2 img{
+		width: 100vw;
+	}
+	.bingkai_3 img{
+		width: 24vw;
+	}
+	.bingkai_4 img{
+		width: 100vw;
+	}
+}
