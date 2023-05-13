@@ -26,8 +26,8 @@
     </div>
     <form class="form w-100" novalidate="novalidate" id="formRegister" action="{{ baseurl }}/user/register/newjoiner" method="POST">
         <div class="text-start mb-10">
-            <h1 class="text-dark fw-bolder mb-3 fs-2x">{{ Lang::bhs('Buat akun Qondangan') }}</h1>
-            <div class="text-gray-400 fw-semibold fs-6">Get unlimited access & earn money</div>
+            <h1 class="text-dark fw-bolder mb-3 fs-2x">{{ Lang::bhs('Buat akun Teriz') }}</h1>
+            <div class="text-gray-400 fw-semibold fs-6">{{ Lang::bhs('Buat akun Login kamu') }}</div>
         </div>
         <div class="fv-row mb-10">
             <input class="form-control form-control-lg" id="nama" type="text" placeholder="{{ Lang::bhs('Nama lengkap') }}" name="nama" autocomplete="off" />
