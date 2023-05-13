@@ -14,78 +14,78 @@ class AuthController
 
     public function login()
     {
-        View::render('Auth/login');
+        echo View::teriz('Auth.login');
     }
 
     public function register()
     {
-        View::render('Auth/register');
+        echo View::teriz('Auth.register');
     }
 
     function ResetPassword()
     {
-        View::render('Auth/reset-password');
+        echo View::teriz('Auth.reset-password');
     }
 
     public function verify($auth_key)
     {
-        $model['verify'] = Model::render('authModel')->checkAuth($auth_key);
-        View::render('Auth/verification-whatsapp', $model);
+        $model['verify'] = Model::teriz('authModel')->checkAuth($auth_key);
+        echo View::teriz('Auth.verification-whatsapp', $model);
     }
 
     function validasiwhatsapp()
     {
-        Model::render('authModel')->validasiWhatsapp($_POST);
+        Model::teriz('authModel')->validasiWhatsapp($_POST);
     }
 
     function resendotpwhatsapp()
     {
-        Model::render('authModel')->resendOTPWhatsapp($_POST);
+        Model::teriz('authModel')->resendOTPWhatsapp($_POST);
     }
 
     function ubahnomor()
     {
-        Model::render('authModel')->ubahNomor($_POST);
+        Model::teriz('authModel')->ubahNomor($_POST);
     }
 
     function checkResetPassword()
     {
-        Model::render('authModel')->checkResetPassword($_POST);
+        Model::teriz('authModel')->checkResetPassword($_POST);
     }
 
     function konfirmasiResetPassword()
     {
-        Model::render('authModel')->konfirmasiResetPassword($_POST);
+        Model::teriz('authModel')->konfirmasiResetPassword($_POST);
     }
 
     function simpanPassword()
     {
-        Model::render('authModel')->simpanPassword($_POST);
+        Model::teriz('authModel')->simpanPassword($_POST);
     }
 
     function verifyMail()
     {
-        Model::render('authModel')->verifyMail($_POST);
+        Model::teriz('authModel')->verifyMail($_POST);
     }
 
     function newjoiner()
     {
-        Model::render('authModel')->checkNewJoiner($_POST);
+        Model::teriz('authModel')->checkNewJoiner($_POST);
     }
 
     public function auth()
     {
-        Model::render('authModel')->auth($_POST);
+        Model::teriz('authModel')->auth($_POST);
     }
 
     function GoogleLogin()
     {
-        Model::render('authModel')->GoogleLogin();
+        Model::teriz('authModel')->GoogleLogin();
     }
 
     function FacebookLogin()
     {
-        Model::render('authModel')->FacebookLogin();
+        Model::teriz('authModel')->FacebookLogin();
     }
 
     function logout()

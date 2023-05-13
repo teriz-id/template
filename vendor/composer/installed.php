@@ -3,7 +3,7 @@
         'name' => 'teriz/zebua',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'fa264001174591f370eebcda20b538949f2ac34e',
+        'reference' => 'fb31bcf313d598848b0710561362a6fc92a6782a',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -286,7 +286,7 @@
         'teriz/zebua' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'fa264001174591f370eebcda20b538949f2ac34e',
+            'reference' => 'fb31bcf313d598848b0710561362a6fc92a6782a',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

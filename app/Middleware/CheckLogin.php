@@ -4,7 +4,7 @@ namespace Zebua\Teriz\Middleware;
 
 use Zebua\Teriz\App\Database;
 
-class CheckLoginTwo implements Middleware
+class CheckLogin implements Middleware
 {
     private $db;
 

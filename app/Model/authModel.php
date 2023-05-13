@@ -137,7 +137,7 @@ class authModel
                     sleep(1);
                 }
                 header('Content-Type: application/json');
-                $response = array('status' => 'error', 'keterangan' => 'Timeout: API Whatsapp tidak merespon.');
+                $response = array('status' => 'error', 'keterangan' => 'Timeout: Periksa kembali nomor kamu.');
                 echo json_encode($response);
             } catch (PDOException) {
                 header('Content-Type: application/json');

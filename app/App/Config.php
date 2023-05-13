@@ -14,28 +14,6 @@ class Conf
         return self::$db->single()['val'];
     }
 
-    public static function meta()
-    {
-        echo "<title> " . self::getMeta()['title'] . " </title>\n\t";
-        echo '<meta name="description" content="' . self::getMeta()['description'] . '">' . "\n\t";
-        echo '<meta name="keywords" content="' . self::getMeta()['keywords'] . '">' . "\n\t";
-
-        // echo "<meta property=\"og:locale\" content=\"" . strtolower($this->identitas()->country) . "\" />\n\t";
-        // echo "<meta property=\"og:type\" content=\"website\" />\n\t";
-        // echo "<meta property=\"og:url\" content=\"" . $this->getUri() . "\" />\n\t";
-        // echo "<meta property=\"og:title\" content=\"" . $this->meta()['title'] . "\" />\n\t";
-        // echo "<meta property=\"og:description\" content=\"" . $this->meta()['description'] . "\" />\n\t";
-        // echo "<meta property=\"og:site_name\" content=\"" . $this->meta()['title'] . "\" />\n\t";
-
-        // echo "<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t";
-        // echo "<meta name=\"twitter:site\" content=\"@" . str_replace("https://twitter.com/", "", str_replace("https://www.twitter.com/", "", $this->meta()['twitter'])) . "\">\n\t";
-        // echo "<meta name=\"twitter:title\" content=\"" . $this->meta()['title'] . "\">\n\t";
-        // echo "<meta name=\"twitter:description\" content=\"" . $this->meta()['description'] . "\">\n\t";
-        // echo "<meta name=\"twitter:creator\" content=\"@" . str_replace("https://twitter.com/", "", str_replace("https://www.twitter.com/", "", $this->meta()['twitter'])) . "\">\n\t";
-        // echo "<meta name=\"twitter:image\" content=\"" . $this->meta()['twitter_image'] . "\">\n\t";
-        // echo "<meta name=\"twitter:domain\" content=\"" . $this->getUri() . "\">\n\t";
-    }
-
     public static function getMeta()
     {
         $meta = [

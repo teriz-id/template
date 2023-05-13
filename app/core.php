@@ -17,7 +17,6 @@ else :
     define('DB_NAME', 'u1604216_qondangan');
 endif;
 
-
 define("ROOT", dirname(dirname(__FILE__)));
 define("APP", ROOT . '/app');
 define("PUB", ROOT . "/public");
