@@ -57,144 +57,6 @@ class authModel
         return $this->db->single();
     }
 
-    function validasiWhatsapp($data)
-    {
-        if ($this->checkOtp($data) > 0) {
-            $validasi = $this->checkOtp($data);
-            $current_time = date('Y-m-d H:i:s');
-            $expiration_time = date('Y-m-d H:i:s', strtotime($validasi['exp_token_reset'] . ' +15 minutes'));
-            if (strtotime($current_time) < strtotime($expiration_time)) {
-                try {
-                    $this->db->query("UPDATE users SET is_verify=:is_verify, auth_key=:auth_key, auth_otp=:auth_otp WHERE auth_key=:auth_keys");
-                    $this->db->bind(':is_verify', 'Yes');
-                    $this->db->bind(':auth_otp', null);
-                    $this->db->bind(':auth_key', null);
-                    $this->db->bind(':auth_keys', $data['auth_key']);
-                    $this->db->execute();
-                    header('Content-Type: application/json');
-                    $response = array('status' => 'success', 'keterangan' => Lang::bhs('Whatsapp kamu berhasil di verifikasi.'), 'url' => baseurl . '/user/login');
-                    echo json_encode($response);
-                    exit();
-                } catch (PDOException $e) {
-                    header('Content-Type: application/json');
-                    $qrcode = array('status' => 'failed', 'keterangan' => Lang::bhs('Gagal verifikasi akun.'));
-                    echo json_encode($qrcode);
-                }
-            } else {
-                header('Content-Type: application/json');
-                $response = array('status' => 'kadaluarsa', 'keterangan' => 'Kode Verifikasi kamu telah kadaluarsa.', 'key' => $data['auth_key'], 'url' => baseurl . '/user/register/resendotpwhatsapp');
-                echo json_encode($response);
-                exit();
-            }
-        } else {
-            header('Content-Type: application/json');
-            $response = array('status' => 'failed', 'keterangan' => 'Kode OTP tidak valid.');
-            echo json_encode($response);
-            exit();
-        }
-    }
-
-    function ubahNomor($data)
-    {
-        if ($this->checkAuth($data['auth_key']) > 0) {
-            $nohp = preg_replace('/[^0-9]/', '', $data['whatsapp']);
-            $hp = ltrim($nohp, '0');
-            $whatsapp = $data['negara'] . $hp;
-            $pola = '/^\d{10,14}$/';
-            if (!preg_match($pola, $whatsapp)) {
-                header('Content-Type: application/json');
-                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Nomor Whatsapp tidak valid. '));
-                echo json_encode($response);
-                exit();
-            }
-            if ($this->checkHP($whatsapp) > 0) {
-                header('Content-Type: application/json');
-                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Nomor HP telah digunakan!'));
-                echo json_encode($response);
-                exit();
-            }
-            $otp = rand(100000, 999999);
-            try {
-                $sender = new WhatsappAPI($whatsapp, 'Kode Verifikasi Qondangan *' . $otp . '*' . "\n\n" . 'JANGAN berikan kode rahasia ini kepada siapapun, termasuk pihak yang mengaku dari Qondangan ' . "\n\n" . 'Kode kadaluarsa dalam 15 Menit' . "\n\n" . 'Hubungi Admin jika butuh bantuan');
-                $timeout = 10;
-                $start_time = time();
-                while (time() - $start_time < $timeout) {
-                    $respon = json_decode($sender->send());
-                    if ($respon->status == true) {
-                        $this->db->query("UPDATE users SET hp=:hp, exp_token_reset=:exp_token_reset, auth_otp=:auth_otp WHERE auth_key=:auth_key");
-                        $this->db->bind(':hp', $whatsapp);
-                        $this->db->bind(':exp_token_reset', date('Y-m-d H:i:s'));
-                        $this->db->bind(':auth_otp', $otp);
-                        $this->db->bind(':auth_key', $data['auth_key']);
-                        $this->db->execute();
-                        if ($this->db->rowCount() > 0) {
-                            header('Content-Type: application/json');
-                            $response = array('status' => 'success', 'keterangan' => Lang::bhs('Nomor handphone berhasil diubah dan mengirim ulang kode verifikasi.'), 'whatsapp' => substr($whatsapp, 0, 5) . '-' . substr($whatsapp, 5, 4) . '-' . substr($whatsapp, 9));
-                            echo json_encode($response);
-                            exit();
-                        }
-                    }
-                    sleep(1);
-                }
-                header('Content-Type: application/json');
-                $response = array('status' => 'error', 'keterangan' => 'Timeout: Periksa kembali nomor kamu.');
-                echo json_encode($response);
-            } catch (PDOException) {
-                header('Content-Type: application/json');
-                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Gagal mengubah nomor handphone!'));
-                echo json_encode($response);
-                exit();
-            }
-        } else {
-            header('Content-Type: application/json');
-            $response = array('status' => 'failed', 'keterangan' => 'Auth Key tidak ditemukan.');
-            echo json_encode($response);
-            exit();
-        }
-    }
-
-    function resendOTPWhatsapp($data)
-    {
-        if ($this->checkAuth($data['key']) > 0) {
-            $user = $this->checkAuth($data['key']);
-            $otp = rand(100000, 999999);
-            try {
-                $sender = new WhatsappAPI($user['hp'], 'Kode Verifikasi Qondangan *' . $otp . '*' . "\n\n" . 'JANGAN berikan kode rahasia ini kepada siapapun, termasuk pihak yang mengaku dari Qondangan ' . "\n\n" . 'Kode kadaluarsa dalam 15 Menit' . "\n\n" . 'Hubungi Admin jika butuh bantuan');
-                $timeout = 10;
-                $start_time = time();
-                while (time() - $start_time < $timeout) {
-                    $respon = json_decode($sender->send());
-                    if ($respon->status == true) {
-                        $this->db->query("UPDATE users SET exp_token_reset=:exp_token_reset, auth_otp=:auth_otp WHERE auth_key=:auth_key");
-                        $this->db->bind(':exp_token_reset', date('Y-m-d H:i:s'));
-                        $this->db->bind(':auth_otp', $otp);
-                        $this->db->bind(':auth_key', $data['key']);
-                        $this->db->execute();
-                        if ($this->db->rowCount() > 0) {
-                            header('Content-Type: application/json');
-                            $response = array('status' => 'success', 'keterangan' => Lang::bhs('Kode Verifikasi berhasil dikirim ulang.'));
-                            echo json_encode($response);
-                        }
-                    }
-                    sleep(1);
-                }
-                header('Content-Type: application/json');
-                $response = array('status' => 'error', 'keterangan' => 'Timeout: API Whatsapp tidak merespon.');
-                echo json_encode($response);
-            } catch (PDOException) {
-                header('Content-Type: application/json');
-                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Gagal mengirim ulang kode verifikasi!'));
-                echo json_encode($response);
-                exit();
-            }
-        } else {
-            header('Content-Type: application/json');
-            $response = array('status' => 'failed', 'keterangan' => 'Auth Key tidak ditemukan.');
-            echo json_encode($response);
-            exit();
-        }
-    }
-
     public function auth($data)
     {
         if ($this->checkUser($data['email']) > 0) {
@@ -329,44 +191,212 @@ class authModel
             exit();
         }
 
-        $otp = rand(100000, 999999);
         $username = explode('@', $data['email']);
         $authkey = md5(time());
         try {
-            $sender = new WhatsappAPI($whatsapp, 'Kode Verifikasi Qondangan *' . $otp . '*' . "\n\n" . 'JANGAN berikan kode rahasia ini kepada siapapun, termasuk pihak yang mengaku dari Qondangan ' . "\n\n" . 'Kode kadaluarsa dalam 15 Menit' . "\n\n" . 'Hubungi Admin jika butuh bantuan');
-            $timeout = 10;
-            $start_time = time();
-            while (time() - $start_time < $timeout) {
-                $respon = json_decode($sender->send());
-                if ($respon->status == true) {
-                    $this->db->query("INSERT INTO users SET nama=:nama, email=:email, hp=:hp, username=:username, password=:password, exp_token_reset=:exp_token_reset, auth_key=:auth_key, auth_otp=:auth_otp, lang=:lang");
-                    $this->db->bind(':nama', $data['nama']);
-                    $this->db->bind(':email', $data['email']);
-                    $this->db->bind(':hp', $whatsapp);
-                    $this->db->bind(':username', $username[0]);
-                    $this->db->bind(':password', md5($data['password']));
-                    $this->db->bind(':exp_token_reset', date('Y-m-d H:i:s'));
-                    $this->db->bind(':auth_key', $authkey);
-                    $this->db->bind(':auth_otp', $otp);
-                    $this->db->bind(':lang', 'id');
-                    $this->db->execute();
-                    if ($this->db->rowCount() > 0) {
-                        header('Content-Type: application/json');
-                        $response = array('status' => 'success', 'keterangan' => Lang::bhs('Data user berhasil disimpan'), 'url' => baseurl . '/user/register/verification/' . $authkey);
-                        echo json_encode($response);
-                        exit();
-                    }
-                }
-                sleep(1);
+            $this->db->query("INSERT INTO users SET nama=:nama, email=:email, hp=:hp, username=:username, password=:password, exp_token_reset=:exp_token_reset, auth_key=:auth_key, lang=:lang");
+            $this->db->bind(':nama', $data['nama']);
+            $this->db->bind(':email', $data['email']);
+            $this->db->bind(':hp', $whatsapp);
+            $this->db->bind(':username', $username[0]);
+            $this->db->bind(':password', md5($data['password']));
+            $this->db->bind(':exp_token_reset', date('Y-m-d H:i:s'));
+            $this->db->bind(':auth_key', $authkey);
+            $this->db->bind(':lang', 'id');
+            $this->db->execute();
+            if ($this->db->rowCount() > 0) {
+                header('Content-Type: application/json');
+                $response = array('status' => 'success', 'keterangan' => Lang::bhs('Data user berhasil disimpan'), 'url' => baseurl . '/user/register/verification/' . $authkey);
+                echo json_encode($response);
+                exit();
             }
-            $tele = new TelegramBot('5873505936:AAF1SU3f2ap1wdrXgrRJkSkEhfgQNicPOsc', '799194688', 'error nih');
-            $tele->sendMessage();
-            header('Content-Type: application/json');
-            $response = array('status' => 'error', 'keterangan' => 'Timeout: API Whatsapp tidak merespon.');
-            echo json_encode($response);
         } catch (PDOException) {
             header('Content-Type: application/json');
             $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Gagal menyimpan data user.'));
+            echo json_encode($response);
+            exit();
+        }
+    }
+
+    function sendOTP($data)
+    {
+        if ($this->checkAuth($data['auth_key']) > 0) {
+            $user = $this->checkAuth($data['auth_key']);
+            if ($user['auth_otp'] == NULL) {
+                $otp = rand(100000, 999999);
+                $sender = new WhatsappAPI($user['hp'], 'Kode Verifikasi Qondangan *' . $otp . '*' . "\n\n" . 'JANGAN berikan kode rahasia ini kepada siapapun, termasuk pihak yang mengaku dari Qondangan ' . "\n\n" . 'Kode kadaluarsa dalam 15 Menit' . "\n\n" . 'Hubungi Admin jika butuh bantuan');
+                $timeout = 10;
+                $start_time = time();
+                while (time() - $start_time < $timeout) {
+                    $respon = json_decode($sender->send());
+                    if ($respon->status == true) {
+                        $this->db->query("UPDATE users SET auth_otp=:auth_otp WHERE auth_key=:auth_key");
+                        $this->db->bind(':auth_otp', $otp);
+                        $this->db->bind(':auth_key', $data['auth_key']);
+                        $this->db->execute();
+                        if ($this->db->rowCount() > 0) {
+                            header('Content-Type: application/json');
+                            $response = array('status' => 'success', 'keterangan' => Lang::bhs('Kode verifikasi berhasil dikirim'));
+                            echo json_encode($response);
+                            exit();
+                        }
+                    }
+                    sleep(1);
+                }
+                header('Content-Type: application/json');
+                $response = array('status' => 'failed', 'keterangan' => 'Timeout: Cek kembali nomor hp kamu.');
+                echo json_encode($response);
+                exit();
+            }
+            header('Content-Type: application/json');
+            $response = array('status' => 'failed', 'keterangan' => 'Kode verifikasi telah dikirim');
+            echo json_encode($response);
+            exit();
+        } else {
+            header('Content-Type: application/json');
+            $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Data tidak ditemukan'));
+            echo json_encode($response);
+            exit();
+        }
+    }
+
+    function validasiWhatsapp($data)
+    {
+        if ($this->checkOtp($data) > 0) {
+            $validasi = $this->checkOtp($data);
+            $current_time = date('Y-m-d H:i:s');
+            $expiration_time = date('Y-m-d H:i:s', strtotime($validasi['exp_token_reset'] . ' +15 minutes'));
+            if (strtotime($current_time) < strtotime($expiration_time)) {
+                try {
+                    $this->db->query("UPDATE users SET is_verify=:is_verify, auth_key=:auth_key, auth_otp=:auth_otp WHERE auth_key=:auth_keys");
+                    $this->db->bind(':is_verify', 'Yes');
+                    $this->db->bind(':auth_otp', null);
+                    $this->db->bind(':auth_key', null);
+                    $this->db->bind(':auth_keys', $data['auth_key']);
+                    $this->db->execute();
+                    header('Content-Type: application/json');
+                    $response = array('status' => 'success', 'keterangan' => Lang::bhs('Whatsapp kamu berhasil di verifikasi.'), 'url' => baseurl . '/user/login');
+                    echo json_encode($response);
+                    exit();
+                } catch (PDOException $e) {
+                    header('Content-Type: application/json');
+                    $qrcode = array('status' => 'failed', 'keterangan' => Lang::bhs('Gagal verifikasi akun.'));
+                    echo json_encode($qrcode);
+                    exit();
+                }
+            } else {
+                header('Content-Type: application/json');
+                $response = array('status' => 'kadaluarsa', 'keterangan' => 'Kode Verifikasi kamu telah kadaluarsa.', 'key' => $data['auth_key'], 'url' => baseurl . '/user/register/resendotpwhatsapp');
+                echo json_encode($response);
+                exit();
+            }
+        } else {
+            header('Content-Type: application/json');
+            $response = array('status' => 'failed', 'keterangan' => 'Kode OTP tidak valid.');
+            echo json_encode($response);
+            exit();
+        }
+    }
+
+    function ubahNomor($data)
+    {
+        if ($this->checkAuth($data['auth_key']) > 0) {
+            $nohp = preg_replace('/[^0-9]/', '', $data['whatsapp']);
+            $hp = ltrim($nohp, '0');
+            $whatsapp = $data['negara'] . $hp;
+            $pola = '/^\d{10,14}$/';
+            if (!preg_match($pola, $whatsapp)) {
+                header('Content-Type: application/json');
+                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Nomor Whatsapp tidak valid. '));
+                echo json_encode($response);
+                exit();
+            }
+            if ($this->checkHP($whatsapp) > 0) {
+                header('Content-Type: application/json');
+                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Nomor HP telah digunakan!'));
+                echo json_encode($response);
+                exit();
+            }
+            $otp = rand(100000, 999999);
+            try {
+                $sender = new WhatsappAPI($whatsapp, 'Kode Verifikasi Qondangan *' . $otp . '*' . "\n\n" . 'JANGAN berikan kode rahasia ini kepada siapapun, termasuk pihak yang mengaku dari Qondangan ' . "\n\n" . 'Kode kadaluarsa dalam 15 Menit' . "\n\n" . 'Hubungi Admin jika butuh bantuan');
+                $timeout = 10;
+                $start_time = time();
+                while (time() - $start_time < $timeout) {
+                    $respon = json_decode($sender->send());
+                    if ($respon->status == true) {
+                        $this->db->query("UPDATE users SET hp=:hp, exp_token_reset=:exp_token_reset, auth_otp=:auth_otp WHERE auth_key=:auth_key");
+                        $this->db->bind(':hp', $whatsapp);
+                        $this->db->bind(':exp_token_reset', date('Y-m-d H:i:s'));
+                        $this->db->bind(':auth_otp', $otp);
+                        $this->db->bind(':auth_key', $data['auth_key']);
+                        $this->db->execute();
+                        if ($this->db->rowCount() > 0) {
+                            header('Content-Type: application/json');
+                            $response = array('status' => 'success', 'keterangan' => Lang::bhs('Nomor handphone berhasil diubah dan mengirim ulang kode verifikasi.'), 'whatsapp' => substr($whatsapp, 0, 5) . '-' . substr($whatsapp, 5, 4) . '-' . substr($whatsapp, 9));
+                            echo json_encode($response);
+                            exit();
+                        }
+                    }
+                    sleep(1);
+                }
+                header('Content-Type: application/json');
+                $response = array('status' => 'error', 'keterangan' => 'Timeout: Periksa kembali nomor kamu.');
+                echo json_encode($response);
+                exit();
+            } catch (PDOException) {
+                header('Content-Type: application/json');
+                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Gagal mengubah nomor handphone!'));
+                echo json_encode($response);
+                exit();
+            }
+        } else {
+            header('Content-Type: application/json');
+            $response = array('status' => 'failed', 'keterangan' => 'Auth Key tidak ditemukan.');
+            echo json_encode($response);
+            exit();
+        }
+    }
+
+    function resendOTPWhatsapp($data)
+    {
+        if ($this->checkAuth($data['key']) > 0) {
+            $user = $this->checkAuth($data['key']);
+            $otp = rand(100000, 999999);
+            try {
+                $sender = new WhatsappAPI($user['hp'], 'Kode Verifikasi Qondangan *' . $otp . '*' . "\n\n" . 'JANGAN berikan kode rahasia ini kepada siapapun, termasuk pihak yang mengaku dari Qondangan ' . "\n\n" . 'Kode kadaluarsa dalam 15 Menit' . "\n\n" . 'Hubungi Admin jika butuh bantuan');
+                $timeout = 10;
+                $start_time = time();
+                while (time() - $start_time < $timeout) {
+                    $respon = json_decode($sender->send());
+                    if ($respon->status == true) {
+                        $this->db->query("UPDATE users SET exp_token_reset=:exp_token_reset, auth_otp=:auth_otp WHERE auth_key=:auth_key");
+                        $this->db->bind(':exp_token_reset', date('Y-m-d H:i:s'));
+                        $this->db->bind(':auth_otp', $otp);
+                        $this->db->bind(':auth_key', $data['key']);
+                        $this->db->execute();
+                        if ($this->db->rowCount() > 0) {
+                            header('Content-Type: application/json');
+                            $response = array('status' => 'success', 'keterangan' => Lang::bhs('Kode Verifikasi berhasil dikirim ulang.'));
+                            echo json_encode($response);
+                            exit();
+                        }
+                    }
+                    sleep(1);
+                }
+                header('Content-Type: application/json');
+                $response = array('status' => 'failed', 'keterangan' => 'Timeout: API Whatsapp tidak merespon.');
+                echo json_encode($response);
+                exit();
+            } catch (PDOException) {
+                header('Content-Type: application/json');
+                $response = array('status' => 'failed', 'keterangan' => Lang::bhs('Gagal mengirim ulang kode verifikasi!'));
+                echo json_encode($response);
+                exit();
+            }
+        } else {
+            header('Content-Type: application/json');
+            $response = array('status' => 'failed', 'keterangan' => 'Auth Key tidak ditemukan.');
             echo json_encode($response);
             exit();
         }

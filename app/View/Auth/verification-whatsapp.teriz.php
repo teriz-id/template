@@ -355,8 +355,25 @@
 @endsection
 
 @section('script')
-
 <script>
+    $(document).ready(function() {
+        var auth_key = "{{ $verify['auth_key'] }}";
+        $.ajax({
+            type: 'POST',
+            url: hostUrl + 'user/register/sendotp',
+            data: {
+                auth_key: auth_key,
+            },
+            success: function(response) {
+                if (response.status == 'success') {
+                    console.log(response.keterangan);
+                } else {
+                    console.log(response.keterangan);
+                }
+            }
+        });
+    });
+
     $(document).ready(function() {
         var expiration_time = new Date("{{ date('Y-m-d H:i:s', strtotime($verify['exp_token_reset'] . ' +5 minutes')); }}");
         var countdown;

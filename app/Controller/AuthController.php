@@ -43,6 +43,11 @@ class AuthController
         Model::teriz('authModel')->resendOTPWhatsapp($_POST);
     }
 
+    function sendotp()
+    {
+        Model::teriz('authModel')->sendOTP($_POST);
+    }
+
     function ubahnomor()
     {
         Model::teriz('authModel')->ubahNomor($_POST);

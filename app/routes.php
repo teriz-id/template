@@ -18,6 +18,7 @@ Router::add('POST', '/user/login/auth', AuthController::class, 'auth');
 // register
 Router::add('GET', '/user/register', AuthController::class, 'register', [IsLogin::class]);
 Router::add('POST', '/user/register/newjoiner', AuthController::class, 'newjoiner', [IsLogin::class]);
+Router::add('POST', '/user/register/sendotp', AuthController::class, 'sendotp', [IsLogin::class]);
 Router::add('GET', '/user/register/verification/([0-9a-zA-Z]*)', AuthController::class, 'verify');
 Router::add('POST', '/user/register/validasiwhatsapp', AuthController::class, 'validasiwhatsapp');
 Router::add('POST', '/user/register/resendotpwhatsapp', AuthController::class, 'resendotpwhatsapp');
